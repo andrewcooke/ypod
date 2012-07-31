@@ -17,39 +17,55 @@ class Countable(object):
         return session.connection().execute(select([func.count(cls.id)])).scalar()
 
 
+class Generationed(object):
+
+    @classmethod
+    def _current_generation(cls, session, column):
+        gen = session.connection().execute(select([func.max(column)])).scalar()
+        if gen is None: return 0
+        return gen
+
+
 class Artist(Base, Countable):
 
     __tablename__ = 'artists'
     name = Column(UnicodeText)
 
 
-class Album(Base, Countable):
+class Album(Base, Countable, Generationed):
 
     __tablename__ = 'albums'
     name = Column(UnicodeText)
     path = Column(UnicodeText)
     album_artist_id = Column(Integer, ForeignKey(Artist.id), nullable=True)
     album_artist = relationship(Artist, backref='albums')
+    ipod_generation = Column(Integer)
+    disk_generation = Column(Integer)
+    loaded = Column(Boolean, default=False)
+
+    @classmethod
+    def current_ipod_generation(cls, session):
+        return cls._current_generation(session, cls.ipod_generation)
+
+    @classmethod
+    def current_disk_generation(cls, session):
+        return cls._current_generation(session, cls.disk_generation)
 
 
-class Track(Base, Countable):
+class Track(Base, Countable, Generationed):
 
     __tablename__ = 'tracks'
     artist_id = Column(Integer, ForeignKey(Artist.id))
     artist = relationship(Artist, backref='tracks')
-    album_d = Column(Integer, ForeignKey(Album.id))
+    album_id = Column(Integer, ForeignKey(Album.id))
     album = relationship(Album, backref='tracks')
     name = Column(UnicodeText)
     path = Column(UnicodeText)
-    generation = Column(Integer)
-    loaded = Column(Boolean, default=False)
+    disk_generation = Column(Integer)
 
     @classmethod
-    def next_generation(cls, session):
-        try:
-            return 1 + session.connection().execute(select([func.max(cls.generation)])).scalar()
-        except TypeError:
-            return 1
+    def current_disk_generation(cls, session):
+        return cls._current_generation(session, cls.disk_generation)
 
 
 def get_or_create(session, model, **kwargs):
