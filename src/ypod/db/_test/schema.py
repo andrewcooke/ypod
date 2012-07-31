@@ -29,6 +29,7 @@ class SchemaTest(TestCase):
         assert Track.next_generation(session.connection()) == 4
         track = session.query(Track).filter(Track.name == 'a sad song').one()
         assert track.name == 'a sad song'
+        assert track.artist.name == 'bob'
         artist = session.query(Artist).filter(Artist.name == 'bob').one()
         assert artist.name == 'bob'
         assert track.artist == artist
