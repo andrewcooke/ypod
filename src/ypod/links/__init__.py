@@ -1,6 +1,6 @@
 
-from os.path import exists, isdir, join
-from os import mkdir, symlink, unlink
+from os.path import exists, isdir, join, getsize, realpath
+from os import mkdir, symlink, unlink, walk
 
 
 class Links(object):
@@ -8,7 +8,23 @@ class Links(object):
     def __init__(self, config):
         self._root = config.mount
         self._mp3 = config.mp3
+        self._capacity = config.capacity
         self._mkdir(self._root)
+        self._size = sum(self._file_sizes())
+
+    def _file_sizes(self):
+        for root, dirs, files in walk(self._root):
+            for name in files:
+                yield self._file_size(join(root, name))
+
+    @staticmethod
+    def _file_size(path):
+        size = getsize(realpath(path))
+        print '%s: %d' % (path, size)
+        return size
+
+    def has_space(self):
+        return self._size < self._capacity
 
     def _mkdir(self, path):
         if not exists(path): mkdir(path)
@@ -28,10 +44,15 @@ class Links(object):
         print 'loading: %s from %s' % (track, track.path)
         self._mkdir(self._move(track.artist.path))
         self._mkdir(self._move(track.album.path))
+        print '%s -> %s' % (self._move(track.path), track.path)
         symlink(track.path, self._move(track.path))
+        self._size += self._file_size(track.path)
 
     def unload_track(self, track):
+        print 'x %s' % self._move(track.path)
+        self._size -= self._file_size(track.path)
         unlink(self._move(track.path))
 
     def unload_all_tracks(self):
-        raise NotImplementedError('by hand!')
+        if self._size > 0:
+            raise NotImplementedError('by hand!')

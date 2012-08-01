@@ -11,18 +11,25 @@ class Config(object):
     MOUNT = 'mount'
 #    DEFAULT_MOUNT = '/mnt/ipod'
     DEFAULT_MOUNT = '/media/andrew@acooke.org ipod'
+#    DEFAULT_MOUNT = expanduser('~/project/ypod/ln-music')
 
     DB = 'db'
     DEFAULT_DB = 'sqlite://~/.ypod.db'
 #    DEFAULT_DB = 'sqlite://:memory:'
 
+    CAPACITY = 'capacity'
+    DEFAULT_CAPACITY = 140000000000
+#    DEFAULT_CAPACITY = 1000000
+
     MP3 = 'mp3'
     DEFAULT_MP3 = expanduser('~/project/ypod/music')
 
-    def __init__(self, mount=DEFAULT_MOUNT, db=DEFAULT_DB, mp3=DEFAULT_MP3):
+    def __init__(self, mount=DEFAULT_MOUNT, db=DEFAULT_DB, mp3=DEFAULT_MP3,
+                 capacity=DEFAULT_CAPACITY):
         self.mount = mount
         self.db = db
         self.mp3 = mp3
+        self.capacity = capacity
 
     def from_config(self, scp):
         self.get_option(scp, Config.MOUNT)
