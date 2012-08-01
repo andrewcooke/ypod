@@ -1,5 +1,5 @@
 
-from os.path import exists, isdir, join, getsize, realpath
+from os.path import exists, isdir, join, getsize, realpath, dirname
 from os import mkdir, symlink, unlink, walk
 
 
@@ -24,6 +24,7 @@ class Links(object):
         return size
 
     def has_space(self):
+        print '%d < %d' % (self._size, self._capacity)
         return self._size < self._capacity
 
     def _mkdir(self, path):
@@ -32,7 +33,9 @@ class Links(object):
 
     def _move(self, path):
         assert path.startswith(self._mp3)
-        return join(self._root, path[len(self._mp3):])
+        moved = join(self._root, path[len(self._mp3)+1:])
+        print '%s -> %s' % (path, moved)
+        return moved
 
     def __enter__(self):
         return self
@@ -42,14 +45,14 @@ class Links(object):
 
     def load_track(self, track):
         print 'loading: %s from %s' % (track, track.path)
-        self._mkdir(self._move(track.artist.path))
+        self._mkdir(self._move(dirname(track.album.path)))
         self._mkdir(self._move(track.album.path))
         print '%s -> %s' % (self._move(track.path), track.path)
         symlink(track.path, self._move(track.path))
         self._size += self._file_size(track.path)
 
     def unload_track(self, track):
-        print 'x %s' % self._move(track.path)
+        print 'unloading %s' % self._move(track.path)
         self._size -= self._file_size(track.path)
         unlink(self._move(track.path))
 
