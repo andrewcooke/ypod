@@ -11,6 +11,9 @@ class RandomUpdateAlbum(object):
     the former, and deleting the latter only when space is low, a new
     set of albums is loaded efficiently (sampled fairly over all albums
     available).
+
+    This makes a pile of assumptions about how the caller works; see
+    the associated test for the correct logic.
     '''
 
     def __init__(self, session):

@@ -40,7 +40,7 @@ def sync_track(session, next_gen, root, name, album, artists):
         if name not in artists:
             artists[name] = get_or_create(session, Artist, name=name)
         artist = artists[name]
-        track = get_or_create(session, Track, artist=artist, album=album, name=id3['title'][0])
+        track = get_or_create(session, Track, artist=artist, album=album, name=id3['title'][0], path=path)
         track.disk_generation = next_gen
         return album
     except Exception as e:

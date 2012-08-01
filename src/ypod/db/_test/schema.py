@@ -2,7 +2,7 @@
 from unittest import TestCase
 
 from ypod.conf import Config
-from ypod.db.engine import create
+from ypod.db.engine import create_session
 from ypod.db.schema import Track, Artist, Album
 
 
@@ -10,13 +10,13 @@ class SchemaTest(TestCase):
 
     def test_schema(self):
         config = Config(db='sqlite://')
-        Session = create(config)
+        Session = create_session(config)
         session = Session()
         assert Track.current_disk_generation(session) == 0, Track.current_disk_generation(session)
 
     def test_next_disk_generation(self):
         config = Config(db='sqlite://')
-        Session = create(config)
+        Session = create_session(config)
         session = Session()
         artist = Artist(name='bob')
         session.add(artist)

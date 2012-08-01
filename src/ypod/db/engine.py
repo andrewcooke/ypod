@@ -6,7 +6,7 @@ from sqlalchemy.orm.session import sessionmaker
 from ypod.db.schema import Base
 
 
-def create(config):
+def create_session(config):
     engine = create_engine(config.db)
     Base.metadata.create_all(engine)
     return scoped_session(sessionmaker(autocommit=False, bind=engine))

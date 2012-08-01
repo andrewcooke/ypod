@@ -67,6 +67,9 @@ class Track(Base, Countable, Generationed):
     def current_disk_generation(cls, session):
         return cls._current_generation(session, cls.disk_generation)
 
+    def __str__(self):
+        return '%s: %s (%s)' % (self.artist.name, self.name, self.album.name)
+
 
 def get_or_create(session, model, **kwargs):
     instance = session.query(model).filter_by(**kwargs).first()

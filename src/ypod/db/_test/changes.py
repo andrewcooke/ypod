@@ -4,14 +4,14 @@ from unittest import TestCase
 from ypod.conf import Config
 from ypod.db.changes import RandomUpdateAlbum
 from ypod.db.disk import sync_mp3
-from ypod.db.engine import create
+from ypod.db.engine import create_session
 
 
 class SimulateLoadingTest(TestCase):
 
     def test_load(self):
         config = Config(db='sqlite://')
-        Session = create(config)
+        Session = create_session(config)
         session = Session()
         sync_mp3(config, session)
         capacity, contains = 100, 0
